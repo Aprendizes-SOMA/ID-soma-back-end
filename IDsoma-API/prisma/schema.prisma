@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int         @id @default(autoincrement())
+  login     String      @unique
+  senha     String
+  Colaborador Colaborador[]
+  Dependente Dependente[]
+}
+
+model Colaborador {
+  id            Int         @id @default(autoincrement())
+  nome          String
+  CPF           String      @unique
+  adminId       Int
+  admin         Admin        @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  Dependente    Dependente[]
+}
+
+model Dependente {
+  id                Int       @id @default(autoincrement())
+  nome              String
+  CPF               String
+  colaboradorId     Int
+  adminId           Int
+  colaborador       Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+  admin             Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
