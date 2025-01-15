@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const {
-  adicionarColaborador,
-  listarColaboradores,
-  atualizarColaborador,
-  excluirColaborador,
+  addCollaborator,
+  listCollaborators,
+  updateCollaborator,
+  deleteCollaborator,
 } = require('../controllers/collaborator');
 
-router.post('/', adicionarColaborador);
-router.get('/', listarColaboradores);
-router.put('/:id', atualizarColaborador);
-router.delete('/:id', excluirColaborador);
+router.post('/', addCollaborator);
+router.get('/', listCollaborators);
+router.put('/:id', updateCollaborator);
+router.delete('/:id', deleteCollaborator);
 
 module.exports = router;

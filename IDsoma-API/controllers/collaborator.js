@@ -1,62 +1,71 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const adicionarColaborador = async (req, res) => {
-  const { nome, CPF, adminId } = req.body;
+const addCollaborator = async (req, res) => {
+  const { name, CPF, adminId } = req.body;
+
   try {
-    const colaborador = await prisma.colaborador.create({
-      data: { nome, CPF, adminId },
+    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    const collaborator = await prisma.collaborator.create({
+      data: { name, CPF, adminId },
     });
-    res.status(201).json(colaborador);
+
+    res.status(201).json(collaborator);
   } catch (error) {
-    console.error('Erro ao adicionar colaborador:', error.message);
-    res.status(500).json({ error: 'Erro ao adicionar colaborador' });
+    console.error('Error adding collaborator:', error.message);
+    res.status(500).json({ error: 'Error adding collaborator' });
   }
 };
 
-const listarColaboradores = async (req, res) => {
+const listCollaborators = async (req, res) => {
   try {
-    const colaboradores = await prisma.colaborador.findMany({
-      include: { Dependente: true },
+    const collaborators = await prisma.collaborator.findMany({
+      include: { Dependents: true },
     });
-    res.json(colaboradores);
+    res.json(collaborators);
   } catch (error) {
-    console.error('Erro ao listar colaboradores:', error.message);
-    res.status(500).json({ error: 'Erro ao listar colaboradores' });
+    console.error('Error listing collaborators:', error.message);
+    res.status(500).json({ error: 'Error listing collaborators' });
   }
 };
 
-const atualizarColaborador = async (req, res) => {
+const updateCollaborator = async (req, res) => {
   const { id } = req.params;
-  const { nome, CPF } = req.body;
+  const { name, CPF } = req.body;
+
   try {
-    const colaborador = await prisma.colaborador.update({
+    const collaborator = await prisma.collaborator.update({
       where: { id: parseInt(id) },
-      data: { nome, CPF },
+      data: { name, CPF },
     });
-    res.json(colaborador);
+    res.json(collaborator);
   } catch (error) {
-    console.error('Erro ao atualizar colaborador:', error.message);
-    res.status(500).json({ error: 'Erro ao atualizar colaborador' });
+    console.error('Error updating collaborator:', error.message);
+    res.status(500).json({ error: 'Error updating collaborator' });
   }
 };
 
-const excluirColaborador = async (req, res) => {
+const deleteCollaborator = async (req, res) => {
   const { id } = req.params;
+
   try {
-    await prisma.colaborador.delete({
+    await prisma.collaborator.delete({
       where: { id: parseInt(id) },
     });
-    res.json({ message: 'Colaborador excluído com sucesso' });
+    res.json({ message: 'Collaborator successfully deleted' });
   } catch (error) {
-    console.error('Erro ao excluir colaborador:', error.message);
-    res.status(500).json({ error: 'Erro ao excluir colaborador' });
+    console.error('Error deleting collaborator:', error.message);
+    res.status(500).json({ error: 'Error deleting collaborator' });
   }
 };
 
 module.exports = {
-  adicionarColaborador,
-  listarColaboradores,
-  atualizarColaborador,
-  excluirColaborador,
+  addCollaborator,
+  listCollaborators,
+  updateCollaborator,
+  deleteCollaborator,
 };

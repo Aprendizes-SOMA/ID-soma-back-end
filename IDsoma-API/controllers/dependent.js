@@ -1,62 +1,76 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const adicionarDependente = async (req, res) => {
-  const { nome, CPF, colaboradorId, adminId } = req.body;
+const addDependent = async (req, res) => {
+  const { name, CPF, collaboratorId } = req.body;
+
   try {
-    const dependente = await prisma.dependente.create({
-      data: { nome, CPF, colaboradorId, adminId },
+    const collaborator = await prisma.collaborator.findUnique({ where: { id: collaboratorId } });
+    if (!collaborator) {
+      return res.status(404).json({ error: 'Collaborator not found' });
+    }
+
+    const dependent = await prisma.dependent.create({
+      data: {
+        name,
+        CPF,
+        collaboratorId,
+        adminId: collaborator.adminId,
+      },
     });
-    res.status(201).json(dependente);
+
+    res.status(201).json(dependent);
   } catch (error) {
-    console.error('Erro ao adicionar dependente:', error.message);
-    res.status(500).json({ error: 'Erro ao adicionar dependente' });
+    console.error('Error adding dependent:', error.message);
+    res.status(500).json({ error: 'Error adding dependent' });
   }
 };
 
-const listarDependentes = async (req, res) => {
+const listDependents = async (req, res) => {
   try {
-    const dependentes = await prisma.dependente.findMany({
-      include: { colaborador: true, admin: true },
+    const dependents = await prisma.dependent.findMany({
+      include: { Collaborator: true, Admin: true },
     });
-    res.json(dependentes);
+    res.json(dependents);
   } catch (error) {
-    console.error('Erro ao listar dependentes:', error.message);
-    res.status(500).json({ error: 'Erro ao listar dependentes' });
+    console.error('Error listing dependents:', error.message);
+    res.status(500).json({ error: 'Error listing dependents' });
   }
 };
 
-const atualizarDependente = async (req, res) => {
+const updateDependent = async (req, res) => {
   const { id } = req.params;
-  const { nome, CPF } = req.body;
+  const { name, CPF } = req.body;
+
   try {
-    const dependente = await prisma.dependente.update({
+    const dependent = await prisma.dependent.update({
       where: { id: parseInt(id) },
-      data: { nome, CPF },
+      data: { name, CPF },
     });
-    res.json(dependente);
+    res.json(dependent);
   } catch (error) {
-    console.error('Erro ao atualizar dependente:', error.message);
-    res.status(500).json({ error: 'Erro ao atualizar dependente' });
+    console.error('Error updating dependent:', error.message);
+    res.status(500).json({ error: 'Error updating dependent' });
   }
 };
 
-const excluirDependente = async (req, res) => {
+const deleteDependent = async (req, res) => {
   const { id } = req.params;
+
   try {
-    await prisma.dependente.delete({
+    await prisma.dependent.delete({
       where: { id: parseInt(id) },
     });
-    res.json({ message: 'Dependente excluído com sucesso' });
+    res.json({ message: 'Dependent successfully deleted' });
   } catch (error) {
-    console.error('Erro ao excluir dependente:', error.message);
-    res.status(500).json({ error: 'Erro ao excluir dependente' });
+    console.error('Error deleting dependent:', error.message);
+    res.status(500).json({ error: 'Error deleting dependent' });
   }
 };
 
 module.exports = {
-  adicionarDependente,
-  listarDependentes,
-  atualizarDependente,
-  excluirDependente,
+  addDependent,
+  listDependents,
+  updateDependent,
+  deleteDependent,
 };

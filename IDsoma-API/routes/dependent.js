@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const {
-  adicionarDependente,
-  listarDependentes,
-  atualizarDependente,
-  excluirDependente,
-} = require('../controllers/dependent'); 
+  addDependent,
+  listDependents,
+  updateDependent,
+  deleteDependent,
+} = require('../controllers/dependent');
 
-router.post('/', adicionarDependente);
-router.get('/', listarDependentes);
-router.put('/:id', atualizarDependente);
-router.delete('/:id', excluirDependente);
+router.post('/', addDependent);
+router.get('/', listDependents);
+router.put('/:id', updateDependent);
+router.delete('/:id', deleteDependent);
 
 module.exports = router;

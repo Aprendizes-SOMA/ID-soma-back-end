@@ -1,20 +1,21 @@
-require('dotenv').config();
 const express = require('express');
+const dotenv = require('dotenv');
+dotenv.config();
+
 const app = express();
-
-const colaboradoresRoutes = require('./routes/collaborator');
-const dependentesRoutes = require('./routes/dependent');
-
 app.use(express.json());
 
-app.use('/collaborator', colaboradoresRoutes);
-app.use('/dependents', dependentesRoutes);
+const authRoutes = require('./routes/auth');
+const collaboratorsRoutes = require('./routes/collaborator');
+const dependentsRoutes = require('./routes/dependent');
+const adminRoutes = require('./routes/admin');
 
-app.get('/', (req, res) => {
-  res.send('API está rodando!');
-});
+app.use('/auth', authRoutes);
+app.use('/collaborator', collaboratorsRoutes);
+app.use('/dependents', dependentsRoutes);
+app.use('/admin', adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
