@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const secretKey = process.env.JWT_SECRET || 'your-secret-key';
+const secretKey = process.env.JWT_SECRET;
 
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -11,11 +11,23 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    req.user = decoded;
+    req.user = decoded; 
     next();
   } catch (error) {
     res.status(400).json({ error: 'Invalid token.' });
   }
 };
 
-module.exports = { authenticate };
+const authenticateAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(403).json({ error: 'Access denied. User not authenticated.' });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied. User is not an admin.' });
+  }
+
+  next();
+};
+
+module.exports = { authenticate, authenticateAdmin };
