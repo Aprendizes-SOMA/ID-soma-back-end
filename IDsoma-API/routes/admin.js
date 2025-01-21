@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate, authenticateAdmin } = require('../middleware/auth');
-const { addAdmin, updateAdmin, listAdmins } = require('../controllers/admin');
+const { addAdmin, updateAdmin, listAdmins, deleteAdmin } = require('../controllers/admin');
 
-router.post('/', authenticate, authenticateAdmin, addAdmin);
-router.put('/:id', authenticate, authenticateAdmin, updateAdmin);
-router.get('/', authenticate, authenticateAdmin, listAdmins);
+router.post('/', addAdmin);
+router.put('/:id', updateAdmin);
+router.get('/', listAdmins);
+router.delete('/:id', deleteAdmin)
 
 module.exports = router;

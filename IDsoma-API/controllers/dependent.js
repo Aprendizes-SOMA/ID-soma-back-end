@@ -29,7 +29,7 @@ const addDependent = async (req, res) => {
 const listDependents = async (req, res) => {
   try {
     const dependents = await prisma.dependent.findMany({
-      include: { Collaborator: true, Admin: true },
+      include: { collaborator: false, admin: false },
     });
     res.json(dependents);
   } catch (error) {

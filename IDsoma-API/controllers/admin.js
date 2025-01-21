@@ -58,8 +58,23 @@ const listAdmins = async (req, res) => {
   }
 };
 
+const deleteAdmin = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.admin.delete({
+      where: { id: parseInt(id) },
+    });
+    res.json({ message: 'Admin successfully deleted' });
+  } catch (error) {
+    console.error('Error deleting admin:', error.message);
+    res.status(500).json({ error: 'Error deleting admin' });
+  }
+};
+
 module.exports = {
   addAdmin,
   updateAdmin,
   listAdmins,
+  deleteAdmin
 };

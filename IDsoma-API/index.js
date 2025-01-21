@@ -5,12 +5,10 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const authRoutes = require('./routes/auth');
 const collaboratorsRoutes = require('./routes/collaborator');
 const dependentsRoutes = require('./routes/dependent');
 const adminRoutes = require('./routes/admin');
 
-app.use('/auth', authRoutes);
 app.use('/collaborator', collaboratorsRoutes);
 app.use('/dependents', dependentsRoutes);
 app.use('/admin', adminRoutes);
