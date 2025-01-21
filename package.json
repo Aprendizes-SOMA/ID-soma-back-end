@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "IDsoma-API/index.js",
   "scripts": {
-    "build": "npm install && node IDsoma-API/index.js",
+    "build": "npm install && node index.js",
     "dev": "nodemon index.js"
   },
   "keywords": [],
