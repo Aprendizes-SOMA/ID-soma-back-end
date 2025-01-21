@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const jwt = require('jsonwebtoken');
 
 const addAdmin = async (req, res) => {
   const { username, password } = req.body;
@@ -72,9 +73,43 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
+const loginAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { username },
+    });
+
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const token = jwt.sign({ id: admin.id, username: admin.username }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    res.json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error logging in admin:', error.message);
+    res.status(500).json({ error: 'Error logging in admin' });
+  }
+};
+
 module.exports = {
   addAdmin,
   updateAdmin,
   listAdmins,
-  deleteAdmin
+  deleteAdmin,
+  loginAdmin
 };
