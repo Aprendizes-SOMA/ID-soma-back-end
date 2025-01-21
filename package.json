@@ -1,9 +1,10 @@
 {
   "name": "idsoma-api",
   "version": "1.0.0",
-  "main": "IDsoma-API/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "npm install && node index.js",
+    "start": "node index.js",
+    "build": "mkdir -p dist && echo 'Build step not required for API'",
     "dev": "nodemon index.js"
   },
   "keywords": [],
