@@ -30,6 +30,16 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+app.get('/test-db', async (req, res) => {
+  try {
+    const admins = await prisma.admin.findMany();
+    res.status(200).json({ message: 'Database connected successfully', admins });
+  } catch (error) {
+    console.error('Database connection error:', error.message);
+    res.status(500).json({ error: 'Failed to connect to the database' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

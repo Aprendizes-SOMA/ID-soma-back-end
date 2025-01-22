@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 const addCollaborator = async (req, res) => {
   const { name, CPF, adminId } = req.body;
