@@ -3,6 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { PrismaClient } = require('@prisma/client');
+
 const app = express();
 
 const corsOptions = {
@@ -39,6 +41,8 @@ app.get('/test-db', async (req, res) => {
     res.status(500).json({ error: 'Failed to connect to the database' });
   }
 });
+
+const prisma = new PrismaClient();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
