@@ -4,7 +4,7 @@ const prisma = new PrismaClient({
 });
 
 const addCollaborator = async (req, res) => {
-  const { name, CPF, adminId } = req.body;
+  const { name, CPF, adminId, cargo } = req.body;
 
   try {
     const admin = await prisma.admin.findUnique({ where: { id: adminId } });
@@ -13,7 +13,7 @@ const addCollaborator = async (req, res) => {
     }
 
     const collaborator = await prisma.collaborator.create({
-      data: { name, CPF, adminId },
+      data: { name, CPF, adminId, cargo },
     });
 
     res.status(201).json(collaborator);
@@ -37,12 +37,12 @@ const listCollaborators = async (req, res) => {
 
 const updateCollaborator = async (req, res) => {
   const { id } = req.params;
-  const { name, CPF } = req.body;
+  const { name, CPF, cargo } = req.body;
 
   try {
     const collaborator = await prisma.collaborator.update({
       where: { id: parseInt(id) },
-      data: { name, CPF },
+      data: { name, CPF, cargo },
     });
     res.json(collaborator);
   } catch (error) {
