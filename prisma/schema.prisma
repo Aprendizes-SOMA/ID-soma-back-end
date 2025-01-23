@@ -28,7 +28,7 @@ model Collaborator {
 model Dependent {
   id            Int         @id @default(autoincrement())
   name          String
-  CPF           String      @unique
+  parentesco    String
   collaboratorId Int
   adminId       Int
   collaborator  Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
