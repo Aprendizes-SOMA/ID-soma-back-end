@@ -19,6 +19,7 @@ model Collaborator {
   id          Int           @id @default(autoincrement())
   name        String
   CPF         String        @unique
+  cargo       String
   adminId     Int
   admin       Admin         @relation(fields: [adminId], references: [id], onDelete: Cascade)
   Dependents  Dependent[]
