@@ -4,7 +4,7 @@ const prisma = new PrismaClient({
 });
 
 const addDependent = async (req, res) => {
-  const { name, CPF, collaboratorId } = req.body;
+  const { name, parentesco, collaboratorId } = req.body;
 
   try {
     const collaborator = await prisma.collaborator.findUnique({ where: { id: collaboratorId } });
@@ -15,7 +15,7 @@ const addDependent = async (req, res) => {
     const dependent = await prisma.dependent.create({
       data: {
         name,
-        CPF,
+        parentesco,
         collaboratorId,
         adminId: collaborator.adminId,
       },
