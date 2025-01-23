@@ -42,12 +42,12 @@ const listDependents = async (req, res) => {
 
 const updateDependent = async (req, res) => {
   const { id } = req.params;
-  const { name, CPF } = req.body;
+  const { name, parentesco } = req.body;
 
   try {
     const dependent = await prisma.dependent.update({
       where: { id: parseInt(id) },
-      data: { name, CPF },
+      data: { name, parentesco },
     });
     res.json(dependent);
   } catch (error) {
