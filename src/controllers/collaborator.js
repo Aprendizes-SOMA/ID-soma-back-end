@@ -27,12 +27,22 @@ const addCollaborator = async (req, res) => {
 const listCollaborators = async (req, res) => {
   try {
     const collaborators = await prisma.collaborator.findMany({
-      include: { Dependents: true },
+      include: {
+        Dependents: {
+          select: {
+            id: true,
+            name: true,
+            parentesco: true,
+            collaboratorId: true,
+            adminId: true,
+          },
+        },
+      },
     });
     res.json(collaborators);
   } catch (error) {
     console.error(`[listCollaborators] Erro ao listar colaboradores: ${error.message}`, error);
-    res.status(500).json({ error: "Error listing collaborators" });
+    res.status(500).json({ error: 'Error listing collaborators' });
   }
 };
 
