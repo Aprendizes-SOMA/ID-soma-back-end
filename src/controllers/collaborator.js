@@ -9,6 +9,7 @@ const addCollaborator = async (req, res) => {
   try {
     const admin = await prisma.admin.findUnique({ where: { id: adminId } });
     if (!admin) {
+      console.error(`[addCollaborator] Admin com id ${adminId} não encontrado.`);
       return res.status(404).json({ error: "Admin not found" });
     }
 
@@ -18,7 +19,7 @@ const addCollaborator = async (req, res) => {
 
     res.status(201).json(collaborator);
   } catch (error) {
-    console.error("Error adding collaborator:", error.message);
+    console.error(`[addCollaborator] Erro ao adicionar colaborador: ${error.message}`, error);
     res.status(500).json({ error: "Error adding collaborator" });
   }
 };
@@ -30,7 +31,7 @@ const listCollaborators = async (req, res) => {
     });
     res.json(collaborators);
   } catch (error) {
-    console.error("Error listing collaborators:", error.message);
+    console.error(`[listCollaborators] Erro ao listar colaboradores: ${error.message}`, error);
     res.status(500).json({ error: "Error listing collaborators" });
   }
 };
@@ -39,6 +40,7 @@ const listCollaboratorsByName = async (req, res) => {
   const { name } = req.query;
 
   if (!name) {
+    console.error(`[listCollaboratorsByName] Nome não fornecido na query.`);
     return res.status(400).json({ error: "Name must be provided" });
   }
 
@@ -47,20 +49,20 @@ const listCollaboratorsByName = async (req, res) => {
       where: {
         name: {
           contains: name,
-          mode: "insensitive"
-        }
+          mode: "insensitive",
+        },
       },
-      include: {
-        Dependents: true
-      }
+      include: { Dependents: true },
     });
 
     if (collaborators.length === 0) {
+      console.error(`[listCollaboratorsByName] Nenhum colaborador encontrado com o nome "${name}".`);
       return res.status(404).json({ error: "No collaborators found" });
     }
+
     res.json(collaborators);
   } catch (error) {
-    console.error("Error listing collaborators by name:", error.message);
+    console.error(`[listCollaboratorsByName] Erro ao buscar colaboradores por nome: ${error.message}`, error);
     res.status(500).json({ error: "Error listing collaborators by name" });
   }
 };
@@ -69,24 +71,24 @@ const listCollaboratorsByCPF = async (req, res) => {
   const { CPF } = req.query;
 
   if (!CPF) {
+    console.error(`[listCollaboratorsByCPF] CPF não fornecido na query.`);
     return res.status(400).json({ error: "CPF must be provided" });
   }
 
   try {
     const collaborator = await prisma.collaborator.findUnique({
-      where: {
-        CPF: CPF,
-      },
+      where: { CPF },
       include: { Dependents: true },
     });
 
     if (!collaborator) {
+      console.error(`[listCollaboratorsByCPF] Nenhum colaborador encontrado com o CPF "${CPF}".`);
       return res.status(404).json({ error: "No collaborator found" });
     }
 
     res.json(collaborator);
   } catch (error) {
-    console.error("Error listing collaborator by CPF:", error.message);
+    console.error(`[listCollaboratorsByCPF] Erro ao buscar colaborador por CPF: ${error.message}`, error);
     res.status(500).json({ error: "Error listing collaborator by CPF" });
   }
 };
@@ -99,13 +101,15 @@ const getCollaboratorById = async (req, res) => {
       where: { id: Number(id) },
       include: { Dependents: true },
     });
-    if (collaborator) {
-      res.json(collaborator);
-    } else {
-      res.status(404).json({ error: "Collaborator not found" });
+
+    if (!collaborator) {
+      console.error(`[getCollaboratorById] Colaborador com id ${id} não encontrado.`);
+      return res.status(404).json({ error: "Collaborator not found" });
     }
+
+    res.json(collaborator);
   } catch (error) {
-    console.error("Error getting collaborator by ID:", error.message);
+    console.error(`[getCollaboratorById] Erro ao buscar colaborador por ID: ${error.message}`, error);
     res.status(500).json({ error: "Error getting collaborator by ID" });
   }
 };
@@ -119,9 +123,10 @@ const updateCollaborator = async (req, res) => {
       where: { id: parseInt(id) },
       data: { name, CPF, cargo },
     });
+
     res.json(collaborator);
   } catch (error) {
-    console.error("Error updating collaborator:", error.message);
+    console.error(`[updateCollaborator] Erro ao atualizar colaborador com id ${id}: ${error.message}`, error);
     res.status(500).json({ error: "Error updating collaborator" });
   }
 };
@@ -135,7 +140,7 @@ const deleteCollaborator = async (req, res) => {
     });
     res.json({ message: "Collaborator successfully deleted" });
   } catch (error) {
-    console.error("Error deleting collaborator:", error.message);
+    console.error(`[deleteCollaborator] Erro ao deletar colaborador com id ${id}: ${error.message}`, error);
     res.status(500).json({ error: "Error deleting collaborator" });
   }
 };

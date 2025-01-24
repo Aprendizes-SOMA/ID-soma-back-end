@@ -4,11 +4,17 @@ const prisma = new PrismaClient({
 });
 
 const addDependent = async (req, res) => {
-  const { name, parentesco, collaboratorId } = req.body;
+  const { name, parentesco, collaboratorId, adminId } = req.body;
+
+  if (!name || !parentesco || !collaboratorId || !adminId) {
+    console.error('[addDependent] Campos obrigatórios faltando.', req.body);
+    return res.status(400).json({ error: 'All fields (name, parentesco, collaboratorId, adminId) are required' });
+  }
 
   try {
     const collaborator = await prisma.collaborator.findUnique({ where: { id: collaboratorId } });
     if (!collaborator) {
+      console.error(`[addDependent] Colaborador com id ${collaboratorId} não encontrado.`);
       return res.status(404).json({ error: 'Collaborator not found' });
     }
 
@@ -17,13 +23,13 @@ const addDependent = async (req, res) => {
         name,
         parentesco,
         collaboratorId,
-        adminId: collaborator.adminId,
+        adminId,
       },
     });
 
     res.status(201).json(dependent);
   } catch (error) {
-    console.error('Error adding dependent:', error.message);
+    console.error(`[addDependent] Erro ao adicionar dependente: ${error.message}`, error);
     res.status(500).json({ error: 'Error adding dependent' });
   }
 };
@@ -31,11 +37,11 @@ const addDependent = async (req, res) => {
 const listDependents = async (req, res) => {
   try {
     const dependents = await prisma.dependent.findMany({
-      include: { collaborator: false, admin: false },
+      include: { collaborator: true },
     });
     res.json(dependents);
   } catch (error) {
-    console.error('Error listing dependents:', error.message);
+    console.error(`[listDependents] Erro ao listar dependentes: ${error.message}`, error);
     res.status(500).json({ error: 'Error listing dependents' });
   }
 };
@@ -49,9 +55,10 @@ const updateDependent = async (req, res) => {
       where: { id: parseInt(id) },
       data: { name, parentesco },
     });
+
     res.json(dependent);
   } catch (error) {
-    console.error('Error updating dependent:', error.message);
+    console.error(`[updateDependent] Erro ao atualizar dependente com id ${id}: ${error.message}`, error);
     res.status(500).json({ error: 'Error updating dependent' });
   }
 };
@@ -65,7 +72,7 @@ const deleteDependent = async (req, res) => {
     });
     res.json({ message: 'Dependent successfully deleted' });
   } catch (error) {
-    console.error('Error deleting dependent:', error.message);
+    console.error(`[deleteDependent] Erro ao deletar dependente com id ${id}: ${error.message}`, error);
     res.status(500).json({ error: 'Error deleting dependent' });
   }
 };
