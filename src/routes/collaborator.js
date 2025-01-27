@@ -9,13 +9,14 @@ const {
   listCollaboratorsByCPF,
   getCollaboratorById,
 } = require('../controllers/collaborator');
+const authenticateToken = require('../middleware/auth');
 
-router.post('/', addCollaborator);
-router.get('/', listCollaborators);
-router.put('/:id', updateCollaborator);
-router.delete('/:id', deleteCollaborator);
+router.post('/', authenticateToken, addCollaborator);
+router.get('/', authenticateToken, listCollaborators);
+router.put('/:id', authenticateToken, updateCollaborator);
+router.delete('/:id', authenticateToken, deleteCollaborator);
 router.get('/search-name', listCollaboratorsByName);
 router.get('/search-cpf', listCollaboratorsByCPF);
-router.get('/:id', getCollaboratorById);
+router.get('/:id', authenticateToken, getCollaboratorById);
 
 module.exports = router;
