@@ -5,7 +5,7 @@ const authenticateToken = require('../middleware/auth');
 
 router.post('/login', loginAdmin);
 
-router.post('/', addAdmin);
+router.post('/', authenticateToken, addAdmin);
 router.put('/:id', authenticateToken, updateAdmin);
 router.get('/', authenticateToken, listAdmins);
 router.delete('/:id', authenticateToken, deleteAdmin);
