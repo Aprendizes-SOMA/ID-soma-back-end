@@ -6,10 +6,11 @@ const {
   updateDependent,
   deleteDependent,
 } = require('../controllers/dependent');
+const authenticateToken = require('../middleware/auth');
 
-router.post('/', addDependent);
-router.get('/', listDependents);
-router.put('/:id', updateDependent);
-router.delete('/:id', deleteDependent);
+router.post('/', authenticateToken, addDependent);
+router.get('/', authenticateToken, listDependents);
+router.put('/:id', authenticateToken, updateDependent);
+router.delete('/:id', authenticateToken, deleteDependent);
 
 module.exports = router;
