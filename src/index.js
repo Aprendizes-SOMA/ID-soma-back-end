@@ -1,11 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-dotenv.config();
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./docs/swagger.config');
 const { PrismaClient } = require('@prisma/client');
 
+dotenv.config();
+
 const app = express();
+
+const prisma = new PrismaClient();
 
 const corsOptions = {
   origin: ['http://localhost:3000'],
@@ -13,8 +17,9 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
-
 app.use(express.json());
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const collaboratorsRoutes = require('./routes/collaborator');
 const dependentsRoutes = require('./routes/dependent');
@@ -42,9 +47,8 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-const prisma = new PrismaClient();
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Swagger docs em http://localhost:${PORT}/api-docs`);
 });
