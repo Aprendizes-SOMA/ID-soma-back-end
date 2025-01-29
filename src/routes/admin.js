@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { addAdmin, updateAdmin, listAdmins, deleteAdmin, loginAdmin } = require('../controllers/admin');
+const { addAdmin, updateAdmin, listAdmins, deleteAdmin, loginAdmin, logoutAdmin } = require('../controllers/admin');
 const authenticateToken = require('../middleware/auth');
 
 router.post('/login', loginAdmin);
+router.post('/logout', authenticateToken, logoutAdmin); //rota simbólica para logout
 
 router.post('/', authenticateToken, addAdmin);
 router.put('/:id', authenticateToken, updateAdmin);
