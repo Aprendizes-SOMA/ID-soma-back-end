@@ -18,9 +18,9 @@ model Admin {
 model Collaborator {
   id         Int         @id @default(autoincrement())
   name       String
-  CPF        String      @unique
+  cpf        String      @unique
   adminId    Int
-  cargo      String
+  role      String
   admin      Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
   Dependents Dependent[]
 }
