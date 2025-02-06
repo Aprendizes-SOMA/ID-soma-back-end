@@ -3,7 +3,6 @@ const dependentDocs = {
       Dependent: {
         type: 'object',
         properties: {
-          id: { type: 'integer', example: 1 },
           name: { type: 'string', example: 'Artur Silva' },
           collaboratorId: { type: 'integer', example: 1 },
           adminId: { type: 'integer', example: 1 },

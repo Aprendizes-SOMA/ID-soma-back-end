@@ -3,7 +3,6 @@ const collaboratorDocs = {
       Collaborator: {
         type: 'object',
         properties: {
-          id: { type: 'integer', example: 1 },
           name: { type: 'string', example: 'Artur Silva' },
           CPF: { type: 'string', example: '123.456.789-00' },
           adminId: { type: 'integer', example: 1 },
