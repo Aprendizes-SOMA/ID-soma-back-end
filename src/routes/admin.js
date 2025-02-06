@@ -6,7 +6,7 @@ const authenticateToken = require('../middleware/auth');
 router.post('/login', loginAdmin);
 router.post('/logout', authenticateToken, logoutAdmin); //rota simbólica para logout
 
-router.post('/', authenticateToken, addAdmin);
+router.post('/', addAdmin);
 router.put('/:id', authenticateToken, updateAdmin);
 router.get('/', authenticateToken, listAdmins);
 router.delete('/:id', authenticateToken, deleteAdmin);

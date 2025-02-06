@@ -4,7 +4,7 @@ const prisma = new PrismaClient({
 });
 
 const addCollaborator = async (req, res) => {
-  const { name, CPF, adminId, cargo } = req.body;
+  const { name, cpf, adminId, role } = req.body;
 
   try {
     const admin = await prisma.admin.findUnique({ where: { id: adminId } });
@@ -14,7 +14,7 @@ const addCollaborator = async (req, res) => {
     }
 
     const collaborator = await prisma.collaborator.create({
-      data: { name, CPF, adminId, cargo },
+      data: { name, cpf, adminId, role },
     });
 
     res.status(201).json(collaborator);
@@ -42,7 +42,7 @@ const listCollaborators = async (req, res) => {
     res.json(collaborators);
   } catch (error) {
     console.error(`[listCollaborators] Erro ao listar colaboradores: ${error.message}`, error);
-    res.status(500).json({ error: 'Error listing collaborators' });
+    res.status(500).json({ error: "Error listing collaborators" });
   }
 };
 
@@ -50,7 +50,6 @@ const listCollaboratorsByName = async (req, res) => {
   const { name } = req.query;
 
   if (!name) {
-    console.error(`[listCollaboratorsByName] Nome não fornecido na query.`);
     return res.status(400).json({ error: "Name must be provided" });
   }
 
@@ -66,7 +65,6 @@ const listCollaboratorsByName = async (req, res) => {
     });
 
     if (collaborators.length === 0) {
-      console.error(`[listCollaboratorsByName] Nenhum colaborador encontrado com o nome "${name}".`);
       return res.status(404).json({ error: "No collaborators found" });
     }
 
@@ -78,21 +76,19 @@ const listCollaboratorsByName = async (req, res) => {
 };
 
 const listCollaboratorsByCPF = async (req, res) => {
-  const { CPF } = req.query;
+  const { cpf } = req.query;
 
-  if (!CPF) {
-    console.error(`[listCollaboratorsByCPF] CPF não fornecido na query.`);
+  if (!cpf) {
     return res.status(400).json({ error: "CPF must be provided" });
   }
 
   try {
     const collaborator = await prisma.collaborator.findUnique({
-      where: { CPF },
+      where: { cpf },
       include: { Dependents: true },
     });
 
     if (!collaborator) {
-      console.error(`[listCollaboratorsByCPF] Nenhum colaborador encontrado com o CPF "${CPF}".`);
       return res.status(404).json({ error: "No collaborator found" });
     }
 
@@ -113,7 +109,6 @@ const getCollaboratorById = async (req, res) => {
     });
 
     if (!collaborator) {
-      console.error(`[getCollaboratorById] Colaborador com id ${id} não encontrado.`);
       return res.status(404).json({ error: "Collaborator not found" });
     }
 
@@ -126,12 +121,12 @@ const getCollaboratorById = async (req, res) => {
 
 const updateCollaborator = async (req, res) => {
   const { id } = req.params;
-  const { name, CPF, cargo } = req.body;
+  const { name, cpf, role } = req.body;
 
   try {
     const collaborator = await prisma.collaborator.update({
       where: { id: parseInt(id) },
-      data: { name, CPF, cargo },
+      data: { name, cpf, role },
     });
 
     res.json(collaborator);
