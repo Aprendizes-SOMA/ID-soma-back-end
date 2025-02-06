@@ -15,6 +15,11 @@ const authenticateToken = (req, res, next) => {
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
     req.admin = verified;
+
+    if (!req.admin || !req.admin.id) {
+      return res.status(403).json({ error: 'Invalid token or missing admin ID' });
+    }
+
     next();
   } catch (error) {
     res.status(403).json({ error: 'Invalid or expired token' });

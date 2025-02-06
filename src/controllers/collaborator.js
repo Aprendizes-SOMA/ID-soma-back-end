@@ -4,7 +4,8 @@ const prisma = new PrismaClient({
 });
 
 const addCollaborator = async (req, res) => {
-  const { name, cpf, adminId, role } = req.body;
+  const { name, cpf, role } = req.body;
+  const adminId = req.admin.id;
 
   try {
     const admin = await prisma.admin.findUnique({ where: { id: adminId } });
