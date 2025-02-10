@@ -35,10 +35,14 @@ const addDependent = async (req, res) => {
 };
 
 const listDependents = async (req, res) => {
+  const { collaboratorId } = req.query;
+
   try {
     const dependents = await prisma.dependent.findMany({
+      where: collaboratorId ? { collaboratorId: parseInt(collaboratorId) } : {},
       include: { collaborator: true },
     });
+
     res.json(dependents);
   } catch (error) {
     console.error(`[listDependents] Erro ao listar dependentes: ${error.message}`, error);
