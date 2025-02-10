@@ -4,9 +4,9 @@ const collaboratorDocs = {
         type: 'object',
         properties: {
           name: { type: 'string', example: 'Artur Silva' },
-          CPF: { type: 'string', example: '123.456.789-00' },
+          cpf: { type: 'string', example: '123.456.789-00' },
           adminId: { type: 'integer', example: 1 },
-          cargo: { type: 'string', example: 'Desenvolvedor' }
+          role: { type: 'string', example: 'Desenvolvedor' }
         },
       },
     },
@@ -107,7 +107,7 @@ const collaboratorDocs = {
           summary: 'Buscar Colaborador por CPF',
           parameters: [
             {
-              name: 'CPF',
+              name: 'cpf',
               in: 'query',
               required: true,
               description: 'CPF do colaborador a ser buscado',
