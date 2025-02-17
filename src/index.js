@@ -8,7 +8,6 @@ const { PrismaClient } = require('@prisma/client');
 dotenv.config();
 
 const app = express();
-
 const prisma = new PrismaClient();
 
 const corsOptions = {
@@ -16,6 +15,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -24,10 +24,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const collaboratorsRoutes = require('./routes/collaborator');
 const dependentsRoutes = require('./routes/dependent');
 const adminRoutes = require('./routes/admin');
+// const csvImportRoute = require('./routes/csvImportRoute');
 
 app.use('/collaborator', collaboratorsRoutes);
 app.use('/dependents', dependentsRoutes);
 app.use('/admin', adminRoutes);
+// app.use('/api', csvImportRoute);
 
 app.get('/', (req, res) => {
   res.send('Servidor rodando com sucesso!');
