@@ -10,7 +10,7 @@ exports.processCSV = async (filePath) => {
 
     fs.createReadStream(filePath)
       .pipe(csv({ 
-        separator: ',', 
+        separator: ';',
         mapHeaders: ({ header }) => header.toLowerCase().trim() 
       }))
       .on('data', (data) => {
@@ -39,6 +39,7 @@ exports.processCSV = async (filePath) => {
               const dependentsArray = dependents.split(';');
               for (const depStr of dependentsArray) {
                 if (!depStr.trim()) continue;
+                // Esperamos o formato "nomeDependente|parentesco"
                 const [depName, depParentesco] = depStr.split('|').map(item => item.trim());
 
                 if (depName && depParentesco) {
