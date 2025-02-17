@@ -9,7 +9,10 @@ exports.processCSV = async (filePath) => {
     const results = [];
 
     fs.createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: true }))
+      .pipe(csv({ 
+        separator: ',', 
+        mapHeaders: ({ header }) => header.toLowerCase().trim() 
+      }))
       .on('data', (data) => {
         results.push(data);
       })
@@ -17,6 +20,11 @@ exports.processCSV = async (filePath) => {
         try {
           for (const row of results) {
             const { cpf, cargo, nome, dependents } = row;
+
+            if (!cpf || !cargo || !nome) {
+              console.error("Campos obrigatórios faltando na linha:", row);
+              continue;
+            }
 
             const collaborator = await prisma.collaborator.create({
               data: {
