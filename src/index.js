@@ -24,12 +24,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const collaboratorsRoutes = require('./routes/collaborator');
 const dependentsRoutes = require('./routes/dependent');
 const adminRoutes = require('./routes/admin');
-// const csvImportRoute = require('./routes/csvImportRoute');
+const csvImportRoute = require('./routes/csvImportRoute');
 
 app.use('/collaborator', collaboratorsRoutes);
 app.use('/dependents', dependentsRoutes);
 app.use('/admin', adminRoutes);
-// app.use('/api', csvImportRoute);
+app.use('/api', csvImportRoute);
 
 app.get('/', (req, res) => {
   res.send('Servidor rodando com sucesso!');
