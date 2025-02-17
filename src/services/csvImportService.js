@@ -4,8 +4,6 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const DEFAULT_ADMIN_ID = 1;
-
 exports.processCSV = async (filePath) => {
   return new Promise((resolve, reject) => {
     const results = [];
@@ -18,14 +16,14 @@ exports.processCSV = async (filePath) => {
       .on('end', async () => {
         try {
           for (const row of results) {
-            const { cpf, nome, cargo, dependents } = row;
+            const { cpf, cargo, nome, dependents } = row;
 
             const collaborator = await prisma.collaborator.create({
               data: {
-                name: nome,
                 cpf: cpf,
                 role: cargo,
-                adminId: DEFAULT_ADMIN_ID,
+                name: nome,
+                adminId: 3,
               },
             });
 
@@ -33,17 +31,15 @@ exports.processCSV = async (filePath) => {
               const dependentsArray = dependents.split(';');
               for (const depStr of dependentsArray) {
                 if (!depStr.trim()) continue;
+                const [depName, depParentesco] = depStr.split('|').map(item => item.trim());
 
-                const [depNome, depCpf, depParentesco] = depStr.split('|').map(item => item.trim());
-
-                if (depNome && depCpf && depParentesco) {
+                if (depName && depParentesco) {
                   await prisma.dependent.create({
                     data: {
-                      name: depNome,
-                      cpf: depCpf,
+                      name: depName,
                       parentesco: depParentesco,
                       collaboratorId: collaborator.id,
-                      adminId: DEFAULT_ADMIN_ID,
+                      adminId: 3,
                     },
                   });
                 }
