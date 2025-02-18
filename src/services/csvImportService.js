@@ -12,10 +12,14 @@ exports.processCSV = async (filePath) => {
     fs.createReadStream(filePath)
       .pipe(csv({
         separator: ';',
-        mapHeaders: ({ header }) => header.toLowerCase().trim()
+        skipLines: 1,
+        mapHeaders: ({ header }) => {
+          console.log("Cabeçalho identificado:", header);
+          return header.toLowerCase().trim();
+        }
       }))
       .on('data', (row) => {
-        console.log("Linha lida do CSV:", row);
+        console.log("Linha processada:", row);
 
         if (row['código'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.set(row['código'], {
