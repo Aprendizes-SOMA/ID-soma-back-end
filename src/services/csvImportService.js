@@ -42,8 +42,8 @@ exports.processCSV = async (filePath) => {
 
           for (const colaborador of colaboradores) {
             let existingCollaborator = await prisma.collaborator.findUnique({
-              where: { matricula: colaborador.matricula },
-            });
+              where: { matricula: String(colaborador.matricula) },
+            });            
 
             if (!existingCollaborator) {
               existingCollaborator = await prisma.collaborator.create({
