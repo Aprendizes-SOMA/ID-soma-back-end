@@ -6,52 +6,59 @@ const prisma = new PrismaClient();
 
 exports.processCSV = async (filePath) => {
   return new Promise((resolve, reject) => {
-    const results = [];
+    const colaboradores = [];
+    const dependentes = [];
 
     fs.createReadStream(filePath)
       .pipe(csv({ 
         separator: ';',
-        mapHeaders: ({ header }) => header.toLowerCase().trim() 
+        mapHeaders: ({ header }) => header.toLowerCase().trim()
       }))
-      .on('data', (data) => {
-        results.push(data);
+      .on('data', (row) => {
+        if (row.cpf && row.nome && row.cargo) {
+          colaboradores.push({
+            matricula: row.código,
+            cpf: row.cpf,
+            name: row.nome,
+            role: row.cargo
+          });
+        } else if (row['parentesco'] && row['código']) {
+          dependentes.push({
+            colaborador_matricula: row['código'],
+            name: row['nome'],
+            parentesco: row['parentesco']
+          });
+        }
       })
       .on('end', async () => {
         try {
-          for (const row of results) {
-            const { cpf, cargo, nome, dependents } = row;
-
-            if (!cpf || !cargo || !nome) {
-              console.error("Campos obrigatórios faltando na linha:", row);
-              continue;
-            }
-
-            const collaborator = await prisma.collaborator.create({
-              data: {
-                cpf: cpf,
-                role: cargo,
-                name: nome,
-                adminId: 3,
-              },
+          for (const colaborador of colaboradores) {
+            let existingCollaborator = await prisma.collaborator.findUnique({
+              where: { matricula: colaborador.matricula },
             });
 
-            if (dependents) {
-              const dependentsArray = dependents.split(';');
-              for (const depStr of dependentsArray) {
-                if (!depStr.trim()) continue;
-                // Esperamos o formato "nomeDependente|parentesco"
-                const [depName, depParentesco] = depStr.split('|').map(item => item.trim());
+            if (!existingCollaborator) {
+              existingCollaborator = await prisma.collaborator.create({
+                data: {
+                  matricula: colaborador.matricula,
+                  cpf: colaborador.cpf,
+                  name: colaborador.name,
+                  role: colaborador.role,
+                  adminId: 3,
+                },
+              });
+            }
 
-                if (depName && depParentesco) {
-                  await prisma.dependent.create({
-                    data: {
-                      name: depName,
-                      parentesco: depParentesco,
-                      collaboratorId: collaborator.id,
-                      adminId: 3,
-                    },
-                  });
-                }
+            for (const dependente of dependentes) {
+              if (dependente.colaborador_matricula === colaborador.matricula) {
+                await prisma.dependent.create({
+                  data: {
+                    name: dependente.name,
+                    parentesco: dependente.parentesco,
+                    collaboratorId: existingCollaborator.id,
+                    adminId: 3,
+                  },
+                });
               }
             }
           }
