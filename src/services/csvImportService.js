@@ -41,14 +41,14 @@ exports.processCSV = async (filePath) => {
           console.log("Dependentes extraídos:", dependentes);
 
           for (const colaborador of colaboradores) {
-            let existingCollaborator = await prisma.collaborator.findUnique({
+            let existingCollaborator = await prisma.collaborator.findFirst({
               where: { matricula: String(colaborador.matricula) },
-            });            
+            });                     
 
             if (!existingCollaborator) {
               existingCollaborator = await prisma.collaborator.create({
                 data: {
-                  matricula: colaborador.matricula,
+                  matricula: colaborador.matricula || "SEM_MATRICULA",
                   cpf: colaborador.cpf,
                   name: colaborador.name,
                   role: colaborador.role,
@@ -56,7 +56,7 @@ exports.processCSV = async (filePath) => {
                 },
               });
               console.log("Novo colaborador salvo:", existingCollaborator);
-            }
+            }            
           }
 
           for (const dependente of dependentes) {

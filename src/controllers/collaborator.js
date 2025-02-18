@@ -4,18 +4,12 @@ const prisma = new PrismaClient({
 });
 
 const addCollaborator = async (req, res) => {
-  const { name, cpf, role } = req.body;
+  const { matricula, name, cpf, role } = req.body;
   const adminId = req.admin.id;
 
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
-    if (!admin) {
-      console.error(`[addCollaborator] Admin com id ${adminId} não encontrado.`);
-      return res.status(404).json({ error: "Admin not found" });
-    }
-
     const collaborator = await prisma.collaborator.create({
-      data: { name, cpf, adminId, role },
+      data: { matricula, name, cpf, adminId, role },
     });
 
     res.status(201).json(collaborator);
@@ -32,6 +26,7 @@ const listCollaborators = async (req, res) => {
         Dependents: {
           select: {
             id: true,
+            matricula: true,
             name: true,
             parentesco: true,
             collaboratorId: true,
@@ -122,12 +117,12 @@ const getCollaboratorById = async (req, res) => {
 
 const updateCollaborator = async (req, res) => {
   const { id } = req.params;
-  const { name, cpf, role } = req.body;
+  const { matricula, name, cpf, role } = req.body;
 
   try {
     const collaborator = await prisma.collaborator.update({
       where: { id: parseInt(id) },
-      data: { name, cpf, role },
+      data: { matricula, name, cpf, role },
     });
 
     res.json(collaborator);
