@@ -15,16 +15,18 @@ exports.processCSV = async (filePath) => {
         mapHeaders: ({ header }) => header.toLowerCase().trim()
       }))
       .on('data', (row) => {
-        if (row.cpf && row.nome && row.cargo) {
+        console.log("Linha lida do CSV:", row);
+
+        if (row['código'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.push({
-            matricula: row.código,
-            cpf: row.cpf,
-            name: row.nome,
-            role: row.cargo
+            matricula: row['código'],  
+            cpf: row['cpf'],
+            name: row['nome'],
+            role: row['cargo']
           });
-        } else if (row['parentesco'] && row['código']) {
+        } else if (row['código'] && row['nome'] && row['parentesco']) {
           dependentes.push({
-            colaborador_matricula: row['código'],
+            collaboratorMatricula: row['código'], 
             name: row['nome'],
             parentesco: row['parentesco']
           });
@@ -32,6 +34,9 @@ exports.processCSV = async (filePath) => {
       })
       .on('end', async () => {
         try {
+          console.log("Colaboradores extraídos:", colaboradores);
+          console.log("Dependentes extraídos:", dependentes);
+
           for (const colaborador of colaboradores) {
             let existingCollaborator = await prisma.collaborator.findUnique({
               where: { matricula: colaborador.matricula },
@@ -47,27 +52,32 @@ exports.processCSV = async (filePath) => {
                   adminId: 3,
                 },
               });
+              console.log("Novo colaborador salvo:", existingCollaborator);
             }
 
             for (const dependente of dependentes) {
-              if (dependente.colaborador_matricula === colaborador.matricula) {
+              if (dependente.collaboratorMatricula === colaborador.matricula) {
                 await prisma.dependent.create({
                   data: {
                     name: dependente.name,
                     parentesco: dependente.parentesco,
                     collaboratorId: existingCollaborator.id,
+                    collaboratorMatricula: dependente.collaboratorMatricula,
                     adminId: 3,
                   },
                 });
+                console.log("Dependente salvo:", dependente);
               }
             }
           }
           resolve();
         } catch (error) {
+          console.error("Erro ao salvar no banco:", error);
           reject(error);
         }
       })
       .on('error', (error) => {
+        console.error("Erro ao ler CSV:", error);
         reject(error);
       });
   });
