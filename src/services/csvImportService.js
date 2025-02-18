@@ -11,7 +11,7 @@ exports.processCSV = async (filePath) => {
 
     fs.createReadStream(filePath)
       .pipe(csv({
-        separator: ',',
+        separator: ';',
         mapHeaders: ({ header }) => header.toLowerCase().trim()
       }))
       .on('data', (row) => {
