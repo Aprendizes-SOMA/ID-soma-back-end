@@ -11,31 +11,27 @@ exports.processCSV = async (filePath) => {
 
     fs.createReadStream(filePath)
       .pipe(csv({
-        separator: ';',
+        separator: detectDelimiter(filePath),
         mapHeaders: ({ header }) => {
           const normalizedHeader = header ? header.toLowerCase().trim() : null;
-          return normalizedHeader && normalizedHeader !== '' ? normalizedHeader : null; // Ignora colunas vazias
+          return normalizedHeader && normalizedHeader !== '' ? normalizedHeader : null;
         }
       }))
       .on('data', (row) => {
-        const cleanedRow = Object.fromEntries(
-          Object.entries(row).filter(([key, value]) => key && value && value.trim() !== '')
-        );
+        console.log("Linha processada:", row);
 
-        console.log("Linha processada:", cleanedRow);
-
-        if (cleanedRow['codigo'] && cleanedRow['cpf'] && cleanedRow['nome'] && cleanedRow['cargo']) {
+        if (row['codigo'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.push({
-            matricula: cleanedRow['codigo'],
-            cpf: cleanedRow['cpf'],
-            name: cleanedRow['nome'],
-            role: cleanedRow['cargo']
+            matricula: row['codigo'],
+            cpf: row['cpf'],
+            name: row['nome'],
+            role: row['cargo']
           });
-        } else if (cleanedRow['codigo'] && cleanedRow['nome'] && cleanedRow['parentesco']) {
+        } else if (row['codigo'] && row['nome'] && row['parentesco']) {
           dependentes.push({
-            collaboratorMatricula: cleanedRow['codigo'],
-            name: cleanedRow['nome'],
-            parentesco: cleanedRow['parentesco']
+            collaboratorMatricula: row['codigo'],
+            name: row['nome'],
+            parentesco: row['parentesco']
           });
         }
       })
@@ -95,3 +91,8 @@ exports.processCSV = async (filePath) => {
       });
   });
 };
+
+function detectDelimiter(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  return content.includes(';') ? ';' : ',';
+}
