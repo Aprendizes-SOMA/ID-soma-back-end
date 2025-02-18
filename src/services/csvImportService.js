@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 exports.processCSV = async (filePath) => {
   return new Promise((resolve, reject) => {
-    const colaboradores = [];
+    const colaboradores = new Map();
     const dependentes = [];
 
     fs.createReadStream(filePath)
-      .pipe(csv({ 
+      .pipe(csv({
         separator: ';',
         mapHeaders: ({ header }) => header.toLowerCase().trim()
       }))
@@ -18,15 +18,15 @@ exports.processCSV = async (filePath) => {
         console.log("Linha lida do CSV:", row);
 
         if (row['código'] && row['cpf'] && row['nome'] && row['cargo']) {
-          colaboradores.push({
-            matricula: row['código'],  
+          colaboradores.set(row['código'], {
+            matricula: row['código'],
             cpf: row['cpf'],
             name: row['nome'],
             role: row['cargo']
           });
         } else if (row['código'] && row['nome'] && row['parentesco']) {
           dependentes.push({
-            collaboratorMatricula: row['código'], 
+            collaboratorMatricula: row['código'],
             name: row['nome'],
             parentesco: row['parentesco']
           });
@@ -34,10 +34,10 @@ exports.processCSV = async (filePath) => {
       })
       .on('end', async () => {
         try {
-          console.log("Colaboradores extraídos:", colaboradores);
+          console.log("Colaboradores extraídos:", Array.from(colaboradores.values()));
           console.log("Dependentes extraídos:", dependentes);
 
-          for (const colaborador of colaboradores) {
+          for (const colaborador of colaboradores.values()) {
             let existingCollaborator = await prisma.collaborator.findUnique({
               where: { matricula: colaborador.matricula },
             });
@@ -54,22 +54,28 @@ exports.processCSV = async (filePath) => {
               });
               console.log("Novo colaborador salvo:", existingCollaborator);
             }
+          }
 
-            for (const dependente of dependentes) {
-              if (dependente.collaboratorMatricula === colaborador.matricula) {
-                await prisma.dependent.create({
-                  data: {
-                    name: dependente.name,
-                    parentesco: dependente.parentesco,
-                    collaboratorId: existingCollaborator.id,
-                    collaboratorMatricula: dependente.collaboratorMatricula,
-                    adminId: 3,
-                  },
-                });
-                console.log("Dependente salvo:", dependente);
-              }
+          for (const dependente of dependentes) {
+            let collaborator = await prisma.collaborator.findUnique({
+              where: { matricula: dependente.collaboratorMatricula },
+            });
+
+            if (collaborator) {
+              await prisma.dependent.create({
+                data: {
+                  name: dependente.name,
+                  parentesco: dependente.parentesco,
+                  collaboratorId: collaborator.id,
+                  adminId: 3,
+                },
+              });
+              console.log("Dependente salvo:", dependente);
+            } else {
+              console.warn("Colaborador não encontrado para dependente:", dependente);
             }
           }
+
           resolve();
         } catch (error) {
           console.error("Erro ao salvar no banco:", error);
