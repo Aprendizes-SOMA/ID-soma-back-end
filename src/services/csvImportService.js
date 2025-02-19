@@ -4,12 +4,16 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+const normalizeString = (str) => str
+  ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+  : null;
+
 exports.processCSV = async (filePath) => {
   return new Promise((resolve, reject) => {
     const colaboradores = [];
     const dependentes = [];
 
-    fs.createReadStream(filePath)
+    fs.createReadStream(filePath, { encoding: 'utf8' })
       .pipe(csv({
         separator: detectDelimiter(filePath),
         mapHeaders: ({ header }) => {
@@ -22,16 +26,16 @@ exports.processCSV = async (filePath) => {
 
         if (row['codigo'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.push({
-            matricula: row['codigo'] ? String(row['codigo']).trim() : null,
-            cpf: row['cpf'] ? String(row['cpf']).trim() : null,
-            name: row['nome'] ? String(row['nome']).trim() : null,
-            role: row['cargo'] ? String(row['cargo']).trim() : null
-          });               
+            matricula: normalizeString(row['codigo']) || "SEM_MATRICULA",
+            cpf: normalizeString(row['cpf']),
+            name: normalizeString(row['nome']),
+            role: normalizeString(row['cargo'])
+          });
         } else if (row['codigo'] && row['nome'] && row['parentesco']) {
           dependentes.push({
-            collaboratorMatricula: row['codigo'],
-            name: row['nome'],
-            parentesco: row['parentesco']
+            collaboratorMatricula: normalizeString(row['codigo']),
+            name: normalizeString(row['nome']),
+            parentesco: normalizeString(row['parentesco'])
           });
         }
       })
@@ -43,12 +47,12 @@ exports.processCSV = async (filePath) => {
           for (const colaborador of colaboradores) {
             let existingCollaborator = await prisma.collaborator.findUnique({
               where: { matricula: colaborador.matricula },
-            });                            
+            });
 
             if (!existingCollaborator) {
               existingCollaborator = await prisma.collaborator.create({
                 data: {
-                  matricula: colaborador.matricula || "SEM_MATRICULA",
+                  matricula: colaborador.matricula,
                   cpf: colaborador.cpf,
                   name: colaborador.name,
                   role: colaborador.role,
@@ -56,7 +60,7 @@ exports.processCSV = async (filePath) => {
                 },
               });
               console.log("Novo colaborador salvo:", existingCollaborator);
-            }            
+            }
           }
 
           for (const dependente of dependentes) {
