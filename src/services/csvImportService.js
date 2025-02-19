@@ -22,11 +22,11 @@ exports.processCSV = async (filePath) => {
 
         if (row['codigo'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.push({
-            matricula: row['codigo'],
-            cpf: row['cpf'],
-            name: row['nome'],
-            role: row['cargo']
-          });
+            matricula: row['codigo'] ? String(row['codigo']).trim() : null,
+            cpf: row['cpf'] ? String(row['cpf']).trim() : null,
+            name: row['nome'] ? String(row['nome']).trim() : null,
+            role: row['cargo'] ? String(row['cargo']).trim() : null
+          });               
         } else if (row['codigo'] && row['nome'] && row['parentesco']) {
           dependentes.push({
             collaboratorMatricula: row['codigo'],
@@ -41,9 +41,9 @@ exports.processCSV = async (filePath) => {
           console.log("Dependentes extraídos:", dependentes);
 
           for (const colaborador of colaboradores) {
-            let existingCollaborator = await prisma.collaborator.findFirst({
-              where: { matricula: String(colaborador.matricula) },
-            });                     
+            let existingCollaborator = await prisma.collaborator.findUnique({
+              where: { matricula: colaborador.matricula },
+            });                            
 
             if (!existingCollaborator) {
               existingCollaborator = await prisma.collaborator.create({

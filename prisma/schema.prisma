@@ -17,7 +17,7 @@ model Admin {
 
 model Collaborator {
   id         Int         @id @default(autoincrement())
-  matricula  String?     @unique
+  matricula  String      @unique
   name       String
   cpf        String      @unique
   adminId    Int
