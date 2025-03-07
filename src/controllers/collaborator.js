@@ -31,57 +31,23 @@ const addCollaborator = async (req, res) => {
 
 const listCollaborators = async (req, res) => {
   try {
-    let { page = 1, limit = 10, sortBy = "matricula", order = "asc" } = req.query;
-
-    page = parseInt(page);
-    limit = parseInt(limit);
-
-    if (limit > 50) {
-      limit = 50;
-    }
-
-    const validSortFields = ["matricula", "name", "cpf"];
-    if (!validSortFields.includes(sortBy)) {
-      console.warn(`Parâmetro sortBy inválido: ${sortBy}. Usando "matricula" como padrão.`);
-      sortBy = "matricula";
-    }
-
-    order = order.toLowerCase() === "desc" ? "desc" : "asc";
-
-    const offset = (page - 1) * limit;
-
-    const orderBy = {};
-    orderBy[sortBy] = order;
-
     const collaborators = await prisma.collaborator.findMany({
-      take: limit,
-      skip: offset,
-      orderBy,
       include: {
         Dependents: {
           select: {
             id: true,
             name: true,
             parentesco: true,
+            collaboratorId: true,
+            adminId: true,
           },
         },
       },
     });
-
-    const totalItems = await prisma.collaborator.count();
-    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
-
-    res.json({
-      currentPage: page,
-      totalPages,
-      totalItems,
-      pageSize: limit,
-      data: collaborators,
-    });
-
+    res.json(collaborators);
   } catch (error) {
     console.error(`[listCollaborators] Erro ao listar colaboradores: ${error.message}`, error);
-    res.status(500).json({ error: "Erro ao listar colaboradores." });
+    res.status(500).json({ error: 'Error listing collaborators' });
   }
 };
 
