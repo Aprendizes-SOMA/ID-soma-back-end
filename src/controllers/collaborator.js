@@ -42,19 +42,21 @@ const listCollaborators = async (req, res) => {
 
     const validSortFields = ["matricula", "name", "cpf"];
     if (!validSortFields.includes(sortBy)) {
-      return res.status(400).json({ error: "Campo de ordenação inválido." });
+      console.warn(`Parâmetro sortBy inválido: ${sortBy}. Usando "matricula" como padrão.`);
+      sortBy = "matricula";
     }
 
     order = order.toLowerCase() === "desc" ? "desc" : "asc";
 
     const offset = (page - 1) * limit;
 
+    const orderBy = {};
+    orderBy[sortBy] = order;
+
     const collaborators = await prisma.collaborator.findMany({
       take: limit,
       skip: offset,
-      orderBy: {
-        [sortBy]: order,
-      },
+      orderBy,
       include: {
         Dependents: {
           select: {
@@ -67,7 +69,7 @@ const listCollaborators = async (req, res) => {
     });
 
     const totalItems = await prisma.collaborator.count();
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
 
     res.json({
       currentPage: page,
