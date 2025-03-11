@@ -199,12 +199,14 @@ const getCollaboratorByExactName = async (req, res) => {
           mode: "insensitive"
         },
       },
-      include: { Dependents: true },
+      include: { dependents: true },
     });
 
     if (!collaborator) {
       return res.status(404).json({ error: "Nenhum colaborador encontrado com esse nome completo." });
     }
+
+    collaborator.dependents = collaborator.dependents ?? [];
 
     res.json(collaborator);
   } catch (error) {
