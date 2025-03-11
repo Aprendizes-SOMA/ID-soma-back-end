@@ -17,10 +17,11 @@ model Admin {
 
 model Collaborator {
   id         Int         @id @default(autoincrement())
+  matricula  String      @unique
   name       String
-  CPF        String      @unique
+  cpf        String      @unique
   adminId    Int
-  cargo      String
+  role       String
   admin      Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
   Dependents Dependent[]
 }

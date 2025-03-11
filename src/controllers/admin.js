@@ -5,6 +5,10 @@ const prisma = new PrismaClient({
 });
 const jwt = require('jsonwebtoken');
 
+const logoutAdmin = async (req, res) => {
+  res.json({ message: 'Logout realizado com sucesso' });
+};
+
 const addAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -118,5 +122,6 @@ module.exports = {
   updateAdmin,
   listAdmins,
   deleteAdmin,
-  loginAdmin
+  loginAdmin,
+  logoutAdmin,
 };
