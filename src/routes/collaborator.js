@@ -8,6 +8,7 @@ const {
   listCollaboratorsByName,
   listCollaboratorsByCPF,
   getCollaboratorById,
+  getCollaboratorByExactName
 } = require('../controllers/collaborator');
 const authenticateToken = require('../middleware/auth');
 
@@ -18,5 +19,6 @@ router.delete('/:id', authenticateToken, deleteCollaborator);
 router.get('/search-name', listCollaboratorsByName);
 router.get('/search-cpf', listCollaboratorsByCPF);
 router.get('/:id', authenticateToken, getCollaboratorById);
+router.get("/exact-name", getCollaboratorByExactName);
 
 module.exports = router;

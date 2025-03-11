@@ -184,6 +184,32 @@ const deleteCollaborator = async (req, res) => {
   }
 };
 
+const getCollaboratorByExactName = async (req, res) => {
+  const { name } = req.query;
+
+  if (!name) {
+    return res.status(400).json({ error: "O nome completo deve ser fornecido." });
+  }
+
+  try {
+    const collaborator = await prisma.collaborator.findFirst({
+      where: {
+        name: name.trim(),
+      },
+      include: { Dependents: true },
+    });
+
+    if (!collaborator) {
+      return res.status(404).json({ error: "Nenhum colaborador encontrado com esse nome completo." });
+    }
+
+    res.json(collaborator);
+  } catch (error) {
+    console.error(`[getCollaboratorByExactName] Erro ao buscar por nome completo: ${error.message}`, error);
+    res.status(500).json({ error: "Erro ao buscar colaborador." });
+  }
+};
+
 module.exports = {
   addCollaborator,
   listCollaborators,
@@ -192,4 +218,5 @@ module.exports = {
   getCollaboratorById,
   listCollaboratorsByName,
   listCollaboratorsByCPF,
+  getCollaboratorByExactName
 };
