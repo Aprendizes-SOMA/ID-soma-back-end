@@ -194,7 +194,10 @@ const getCollaboratorByExactName = async (req, res) => {
   try {
     const collaborator = await prisma.collaborator.findFirst({
       where: {
-        name: name.trim(),
+        name: {
+          equals: name.trim(),
+          mode: "insensitive"
+        },
       },
       include: { Dependents: true },
     });
