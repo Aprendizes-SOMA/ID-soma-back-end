@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./docs/swagger.config');
+const swaggerDocument = require('./src/docs/swagger.config.js');
 const { PrismaClient } = require('@prisma/client');
 
 dotenv.config();
@@ -21,10 +21,10 @@ app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const collaboratorsRoutes = require('./routes/collaborator');
-const dependentsRoutes = require('./routes/dependent');
-const adminRoutes = require('./routes/admin');
-const csvImportRoute = require('./routes/csvImportRoute');
+const collaboratorsRoutes = require('./src/routes/collaborator');
+const dependentsRoutes = require('./src/routes/dependent');
+const adminRoutes = require('./src/routes/admin');
+const csvImportRoute = require('./src/routes/csvImportRoute');
 
 app.use('/collaborator', collaboratorsRoutes);
 app.use('/dependents', dependentsRoutes);
