@@ -6,6 +6,8 @@ const swaggerDocument = require('./src/docs/swagger.config.js');
 const { PrismaClient } = require('@prisma/client');
 
 dotenv.config();
+console.clear();
+console.log('Iniciando servidor...');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -19,8 +21,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+// Rotas
 const collaboratorsRoutes = require('./src/routes/collaborator');
 const dependentsRoutes = require('./src/routes/dependent');
 const adminRoutes = require('./src/routes/admin');
@@ -31,6 +35,7 @@ app.use('/dependents', dependentsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api', csvImportRoute);
 
+// Rotas de teste
 app.get('/', (req, res) => {
   res.send('Servidor rodando com sucesso!');
 });
@@ -49,8 +54,23 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
+
+function manterAPIAtiva() {
+  const url = 'https://id-soma.onrender.com/health';
+
+  setInterval(async () => {
+    try {
+      const res = await fetch(url);
+      console.log(`[KEEP-ALIVE] Ping enviado - ${res.status} | ${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      console.error(`[KEEP-ALIVE] Erro ao pingar: ${error.message}`);
+    }
+  }, 60000); // 1 minuto
+}
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Swagger docs em http://localhost:${PORT}/api-docs`);
+  manterAPIAtiva(); // Ativa o ping automático
 });
