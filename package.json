@@ -4,7 +4,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "babel src --out-dir dist --extensions \".js,.ts\""
   },
   "keywords": [],
   "author": "",
