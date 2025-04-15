@@ -13,7 +13,7 @@ const app = express();
 const prisma = new PrismaClient();
 
 const corsOptions = {
-  origin: ["http://localhost:3000"],
+  origin: '*',
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -21,10 +21,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Rotas
 const collaboratorsRoutes = require("./src/routes/collaborator");
 const dependentsRoutes = require("./src/routes/dependent");
 const adminRoutes = require("./src/routes/admin");
@@ -35,7 +33,6 @@ app.use("/dependents", dependentsRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api", csvImportRoute);
 
-// Rotas de teste
 app.get("/", (req, res) => {
   res.send("Servidor rodando com sucesso!");
 });
