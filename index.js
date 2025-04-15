@@ -12,8 +12,15 @@ console.log("Iniciando servidor...");
 const app = express();
 const prisma = new PrismaClient();
 
+const allowedOrigins = ['https://somapiaui.com.br', 'http://localhost:3000'];
 const corsOptions = {
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
