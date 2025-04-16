@@ -8,6 +8,17 @@ const normalizeString = (str) => str
   ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
   : null;
 
+const formatCPF = (cpf) => {
+  if (!cpf) return null;
+  
+  const cleanedCPF = cpf.replace(/\D/g, '');
+  
+  if (cleanedCPF.length === 11 && !/(\d{3}\.\d{3}\.\d{3}-\d{2})/.test(cpf)) {
+    return cleanedCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+  return cpf;
+};
+
 exports.processCSV = async (filePath) => {
   return new Promise((resolve, reject) => {
     const colaboradores = [];
@@ -27,7 +38,7 @@ exports.processCSV = async (filePath) => {
         if (row['codigo'] && row['cpf'] && row['nome'] && row['cargo']) {
           colaboradores.push({
             matricula: normalizeString(row['codigo']) || "SEM_MATRICULA",
-            cpf: normalizeString(row['cpf']),
+            cpf: formatCPF(normalizeString(row['cpf'])),
             name: normalizeString(row['nome']),
             role: normalizeString(row['cargo'])
           });
